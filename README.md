@@ -12,7 +12,7 @@ elements are used for drawing all the sprites.
 
 You can play the game right here:
 
-[PLAY XGALAGA JS!](http://kayahr.github.com/xgalaga-js/)
+[PLAY XGALAGA JS!](https://raw.githack.com/aaferrari/xgalaga-js/master/src/main/resources/index.html)
 
 
 TODO

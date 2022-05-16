@@ -75,7 +75,7 @@ body
 
 #xgalaga .menu.hidden
 {
- 	left: -50%;
+    display: none;
 }
 
 #xgalaga .menu .version
