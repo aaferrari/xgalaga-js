@@ -36,7 +36,7 @@ xgalaga.HighScores.prototype.scores;
  * The maximum number of entries in the high score list.
  * @type {number} 
  */
-xgalaga.HighScores.prototype.entries = 5;
+xgalaga.HighScores.prototype.entries = 10;
 
 /**
  * Returns the singleton instance of the high scores list.
@@ -56,30 +56,48 @@ xgalaga.HighScores.getInstance = function()
  */
 xgalaga.HighScores.prototype.load = function()
 {
-    var cookie, name, level, score, i;
-  
-    // TODO IMplement highscore storage.
-    // Read high scores from mojo cookies if possible
-//    if (window.Mojo && Mojo.Model && Mojo.Model.Cookie)
-//        cookie = new Mojo.Model.Cookie("highscores").get();
-/*
-    if (cookie)
+    var cookie, data, encodedScores, scoreFrags, name, level, score, i;
+
+    // First check if there is something stored in localStorage
+    if (localStorage)
     {
-        
-        for (i = 0; i < this.entries; i++)
-        {
-            level = cookie["level" + i];
-            if (!level) continue;
-            name = cookie["name" + i];
-            score = cookie["score" + i];
-            this.scores.push({
-                "name": name,
-                "level": level,
-                "score": score
-            });
+        cookie = localStorage.getItem("highscores");
+        if (cookie !== null) {
+            this.scores = JSON.parse(cookie);
+            return;
         }
-    } else this.reset();
-    */
+    }
+    else // If there is nothing, check in the cookie
+    {
+        cookie = document.cookie.split(';');
+        for (i = 0; i < cookie.length; i++)
+        {
+            if (cookie[i].indexOf("highscores=") == 0) {
+                data = cookie[i].substring("highscores=".length, cookie[i].length);
+                break;
+            }
+        }
+        if (data != null)
+        {
+            // The cookie is saved in the following format: encoded(name),level,score|...
+            encodedScores = data.split("|");
+            for (i = 0; i < this.entries; i++)
+            {
+                scoreFrags = encodedScores[i].split(",");
+                level = parseInt(scoreFrags[1]);
+                name = decodeURIComponent(scoreFrags[0]);
+                score = parseInt(scoreFrags[2]);
+                this.scores.push({
+                    "name": name,
+                    "level": level,
+                    "score": score
+                });
+            }
+            return;
+        }
+    }
+    // If get here it is because there are no saved scores, so default scores are used
+    this.reset();
 };
 
 /**
@@ -89,20 +107,19 @@ xgalaga.HighScores.prototype.save = function()
 {
     var data, max, entry, i;
     
-    data = {};
-    for (i = 0, max = this.scores.length; i < max; i++)
+    // Save scores in localStorage
+    if (localStorage)
+        localStorage.setItem("highscores", JSON.stringify(this.scores));
+    else // If localStorage is not available, cookies are used as failback
     {
-        entry = this.scores[i];
-        data["name" + i] = entry["name"];
-        data["level" + i] = entry["level"];
-        data["score" + i] = entry["score"];
+        data = Array();
+        for (i = 0, max = this.scores.length; i < max; i++)
+        {
+            entry = this.scores[i];
+            data[i] = encodeURIComponent(entry["name"]) + "," + entry["level"] + "," + entry["score"];
+        }
+        document.cookie = "highscores=" + data.join("|") + "; path=/";
     }
-
-    // Write to Mojo cookie if available
-    // TODO Implement highscore saving
-    
-    //if (window.Mojo && Mojo.Model && Mojo.Model.Cookie)
-      //  new Mojo.Model.Cookie("highscores").put(data);
 };
 
 
@@ -112,13 +129,13 @@ xgalaga.HighScores.prototype.save = function()
 
 xgalaga.HighScores.prototype.reset = function()
 {
-    this.scores = [
-        { "name": "-", "level": 1, "score": 0 },
-        { "name": "-", "level": 1, "score": 0 },
-        { "name": "-", "level": 1, "score": 0 },
-        { "name": "-", "level": 1, "score": 0 },
-        { "name": "-", "level": 1, "score": 0 },
-    ];
+    this.scores = [];
+    
+    for (i = 0; i < this.entries; i++)
+    {
+        this.scores[i] = { "name": "-", "level": 1, "score": 0 };
+    }
+    
 };
 
 

@@ -20,8 +20,9 @@ TODO
 
 * Power-ups
 * Bonus ships
-* Highscore-List
+* Show Highscore-List
 * Fix CSS problems in IE7 and IE8.
+* Mobile devices compatibility [WIP].
 
 
 License

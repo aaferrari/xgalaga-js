@@ -660,9 +660,9 @@ xgalaga.Game.prototype.endGame = function()
             xgalaga.formatNumber(score));
         this.showStateLabel();
         
-//        if (xgalaga.HighScores.getInstance().determineRank(score))
-  //          window.setTimeout(this.newHighScore.bind(this), 500);
-    //    else
+        if (xgalaga.HighScores.getInstance().determineRank(score))
+            window.setTimeout(this.newHighScore.bind(this), 500);
+        else
             window.setTimeout(this.startIntro.bind(this), 500);
         this.hud.close();
     }
@@ -746,7 +746,8 @@ xgalaga.Game.prototype.showMenu = function()
 {
     if (this.menu) return;
     this.menu = true;
-    jQuery(".menu", this.container).removeClass("hidden");
+    var gameMenu = document.getElementById("menu");
+    gameMenu.className = gameMenu.className.replace(" hidden", "");
 };
 
 /**
@@ -757,7 +758,7 @@ xgalaga.Game.prototype.hideMenu = function()
 {
     if (!this.menu) return;
     this.menu = false;
-    jQuery(".menu", this.container).addClass("hidden");
+    document.getElementById("menu").className += " hidden";
 };
 
 /**
